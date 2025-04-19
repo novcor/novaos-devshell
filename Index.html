@@ -15,7 +15,7 @@
     }
     #terminal {
       padding: 20px;
-      height: 90vh;
+      height: 80vh;
       overflow-y: auto;
       white-space: pre-wrap;
       background: #1a1a1a;
@@ -30,12 +30,34 @@
       outline: none;
       font-size: 1rem;
     }
+    .buttons {
+      padding: 10px;
+      background: #0f0f0f;
+      border-top: 1px solid #333;
+    }
+    .buttons button {
+      background: #333;
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      margin-right: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .buttons button:hover {
+      background: #444;
+    }
   </style>
 </head>
 <body>
 
   <div id="terminal">Initializing NovaOS DevShell...</div>
   <input type="text" id="input" placeholder=">>> Enter Python code and press Enter"/>
+  
+  <div class="buttons">
+    <button onclick="saveScript()">💾 Save Script</button>
+    <button onclick="loadScript()">📂 Load Script</button>
+  </div>
 
   <script>
     let terminal = document.getElementById("terminal");
@@ -61,6 +83,26 @@
           terminal.scrollTop = terminal.scrollHeight;
         }
       });
+    }
+
+    function saveScript() {
+      const lastInput = terminal.innerText.split(">>> ").pop().trim();
+      if (lastInput) {
+        localStorage.setItem("novaos_last_script", lastInput);
+        terminal.innerText += "\n[Saved script locally]\n";
+        terminal.scrollTop = terminal.scrollHeight;
+      }
+    }
+
+    function loadScript() {
+      const saved = localStorage.getItem("novaos_last_script");
+      if (saved) {
+        input.value = saved;
+        terminal.innerText += "\n[Loaded saved script into input]\n";
+      } else {
+        terminal.innerText += "\n[No saved script found]\n";
+      }
+      terminal.scrollTop = terminal.scrollHeight;
     }
 
     main();
