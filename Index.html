@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NovaOS DevShell</title>
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+  <!-- Monaco CDN -->
+<script src="https://unpkg.com/monaco-editor@latest/min/vs/loader.js"></script>
+  <style>
+    body {
+      background: #0d0d0d;
+      color: #eee;
+      font-family: monospace;
+      margin: 0;
+      padding: 0;
+    }
+    #terminal {
+      padding: 20px;
+      height: 80vh;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      background: #1a1a1a;
+      border-bottom: 1px solid #333;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      background: #111;
+      color: #fff;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+    }
+    .buttons {
+      padding: 10px;
+      background: #0f0f0f;
+      border-top: 1px solid #333;
+    }
+    .buttons button {
+      background: #333;
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      margin-right: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .buttons button:hover {
+      background: #444;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="terminal">Initializing NovaOS DevShell...</div>
+"/>
+  
+  <div class="buttons">
+    <button onclick="saveScript()">💾 Save Script</button>
+    <button onclick="loadScript()">📂 Load Script</button>
+  </div>
+<div id="editor" style="height: 300px; width: 100%; border-top: 1px solid #222;"></div>
+<button onclick="runEditorCode()" style="width: 100%; padding: 12px; background: #222; color: #fff; font-weight: bold;">▶ Run Code</button>
+  <script>
+    let terminal = document.getElementById("terminal");
+    let input = document.getElementById("input");
+
+    async function main() {
+      let pyodide = await loadPyodide();
+      terminal.innerText += "\nNovaOS DevShell ready.\n\n";
+
+      input.addEventListener("keydown", async function(e) {
+        if (e.key === "Enter") {
+          let code = input.value;
+          terminal.innerText += ">>> " + code + "\n";
+          input.value = "";
+
+          try {
+            let result = await pyodide.runPythonAsync(code);
+            terminal.innerText += result + "\n";
+          } catch (err) {
+            terminal.innerText += err + "\n";
+          }
+
+          terminal.scrollTop = terminal.scrollHeight;
+        }
+      });
+    }
+
+    function saveScript() {
+      const lastInput = terminal.innerText.split(">>> ").pop().trim();
+      if (lastInput) {
+        localStorage.setItem("novaos_last_script", lastInput);
+        terminal.innerText += "\n[Saved script locally]\n";
+        terminal.scrollTop = terminal.scrollHeight;
+      }
+    }
+
+    function loadScript() {
+      const saved = localStorage.getItem("novaos_last_script");
+      if (saved) {
+        input.value = saved;
+        terminal.innerText += "\n[Loaded saved script into input]\n";
+      } else {
+        terminal.innerText += "\n[No saved script found]\n";
+      }
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    main();
+    let editor;
+
+require.config({ paths: { 'vs': 'https://unpkg.com/monaco-editor@latest/min/vs' }});
+require(['vs/editor/editor.main'], function () {
+  editor = monaco.editor.create(document.getElementById('editor'), {
+    value: "# Write your Python code here\nprint('Hello from NovaOS!')",
+    language: 'python',
+    theme: 'vs-dark',
+    fontSize: 14,
+    minimap: { enabled: false },
+    lineNumbers: "on"
+  });
+});
+
+async function runEditorCode() {
+  const code = editor.getValue();
+  terminal.innerText += ">>> Running editor code:\n" + code + "\n";
+  try {
+    const result = await pyodide.runPythonAsync(code);
+    terminal.innerText += result + "\n";
+  } catch (err) {
+    terminal.innerText += "[Error] " + err + "\n";
+  }
+  terminal.scrollTop = terminal.scrollHeight;
+}
+  </script>
+</body>
+</html>
