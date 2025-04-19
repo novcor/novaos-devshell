@@ -8,48 +8,59 @@
   <!-- Monaco CDN -->
 <script src="https://unpkg.com/monaco-editor@latest/min/vs/loader.js"></script>
   <style>
-    body {
-      background: #0d0d0d;
-      color: #eee;
-      font-family: monospace;
-      margin: 0;
-      padding: 0;
-    }
-    #terminal {
-      padding: 20px;
-      height: 80vh;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      background: #1a1a1a;
-      border-bottom: 1px solid #333;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      background: #111;
-      color: #fff;
-      border: none;
-      outline: none;
-      font-size: 1rem;
-    }
-    .buttons {
-      padding: 10px;
-      background: #0f0f0f;
-      border-top: 1px solid #333;
-    }
-    .buttons button {
-      background: #333;
-      color: #fff;
-      border: none;
-      padding: 8px 12px;
-      margin-right: 10px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .buttons button:hover {
-      background: #444;
-    }
-  </style>
+  body {
+    background: #0a0a0a;
+    color: #ffd1f9;
+    font-family: 'Fira Code', monospace;
+    margin: 0;
+    padding: 0;
+  }
+
+  #terminal {
+    padding: 20px;
+    height: 40vh;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    background: #1a0018;
+    border-bottom: 2px solid #ff80d5;
+    box-shadow: inset 0 0 10px #ff69b4;
+  }
+
+  #editor {
+    height: 300px;
+    width: 100%;
+    border-top: 2px solid #ff80d5;
+    background-color: #1a0018;
+  }
+
+  .buttons {
+    padding: 10px;
+    background: #0f0010;
+    border-top: 2px solid #ff69b4;
+    display: flex;
+    justify-content: center;
+  }
+
+  .buttons button {
+    background: #330020;
+    color: #ffd1f9;
+    border: 1px solid #ff80d5;
+    padding: 10px 16px;
+    margin: 0 8px;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 8px #ff69b4;
+  }
+
+  .buttons button:hover {
+    background: #ff69b4;
+    color: #1a0018;
+    border: 1px solid #ffd1f9;
+    box-shadow: 0 0 16px #ff69b4;
+  }
+</style>
 </head>
 <body>
 
