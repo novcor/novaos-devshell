@@ -109,6 +109,31 @@
     }
 
     main();
+    let editor;
+
+require.config({ paths: { 'vs': 'https://unpkg.com/monaco-editor@latest/min/vs' }});
+require(['vs/editor/editor.main'], function () {
+  editor = monaco.editor.create(document.getElementById('editor'), {
+    value: "# Write your Python code here\nprint('Hello from NovaOS!')",
+    language: 'python',
+    theme: 'vs-dark',
+    fontSize: 14,
+    minimap: { enabled: false },
+    lineNumbers: "on"
+  });
+});
+
+async function runEditorCode() {
+  const code = editor.getValue();
+  terminal.innerText += ">>> Running editor code:\n" + code + "\n";
+  try {
+    const result = await pyodide.runPythonAsync(code);
+    terminal.innerText += result + "\n";
+  } catch (err) {
+    terminal.innerText += "[Error] " + err + "\n";
+  }
+  terminal.scrollTop = terminal.scrollHeight;
+}
   </script>
 </body>
 </html>
