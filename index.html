@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NovaOS DevShell</title>
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+  <!-- Monaco CDN -->
+<script src="https://unpkg.com/monaco-editor@latest/min/vs/loader.js"></script>
+  <style>
+  body {
+    background: #0a0a0a;
+    color: #ffd1f9;
+    font-family: 'Fira Code', monospace;
+    margin: 0;
+    padding: 0;
+  }
+
+  #terminal {
+    padding: 20px;
+    height: 40vh;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    background: #1a0018;
+    border-bottom: 2px solid #ff80d5;
+    box-shadow: inset 0 0 10px #ff69b4;
+  }
+
+  #editor {
+    height: 300px;
+    width: 100%;
+    border-top: 2px solid #ff80d5;
+    background-color: #1a0018;
+  }
+
+  .buttons {
+    padding: 10px;
+    background: #0f0010;
+    border-top: 2px solid #ff69b4;
+    display: flex;
+    justify-content: center;
+  }
+
+  .buttons button {
+    background: #330020;
+    color: #ffd1f9;
+    border: 1px solid #ff80d5;
+    padding: 10px 16px;
+    margin: 0 8px;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 8px #ff69b4;
+  }
+
+  .buttons button:hover {
+    background: #ff69b4;
+    color: #1a0018;
+    border: 1px solid #ffd1f9;
+    box-shadow: 0 0 16px #ff69b4;
+  }
+</style>
+</head>
+<body>
+
+  <div id="terminal">Initializing NovaOS DevShell...</div>
+"/>
+  
+  <div class="buttons">
+    <button onclick="saveScript()">💾 Save Script</button>
+    <button onclick="loadScript()">📂 Load Script</button>
+  </div>
+<div id="editor" style="height: 300px; width: 100%; border-top: 1px solid #222;"></div>
+<button onclick="runEditorCode()" style="width: 100%; padding: 12px; background: #222; color: #fff; font-weight: bold;">▶ Run Code</button>
+  <script>
+    let terminal = document.getElementById("terminal");
+    let input = document.getElementById("input");
+
+    async function main() {
+      let pyodide = await loadPyodide();
+      terminal.innerText += "\nNovaOS DevShell ready.\n\n";
+
+      input.addEventListener("keydown", async function(e) {
+        if (e.key === "Enter") {
+          let code = input.value;
+          terminal.innerText += ">>> " + code + "\n";
+          input.value = "";
+
+          try {
+            let result = await pyodide.runPythonAsync(code);
+            terminal.innerText += result + "\n";
+          } catch (err) {
+            terminal.innerText += err + "\n";
+          }
+
+          terminal.scrollTop = terminal.scrollHeight;
+        }
+      });
+    }
+
+    function saveScript() {
+      const lastInput = terminal.innerText.split(">>> ").pop().trim();
+      if (lastInput) {
+        localStorage.setItem("novaos_last_script", lastInput);
+        terminal.innerText += "\n[Saved script locally]\n";
+        terminal.scrollTop = terminal.scrollHeight;
+      }
+    }
+
+    function loadScript() {
+      const saved = localStorage.getItem("novaos_last_script");
+      if (saved) {
+        input.value = saved;
+        terminal.innerText += "\n[Loaded saved script into input]\n";
+      } else {
+        terminal.innerText += "\n[No saved script found]\n";
+      }
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    main();
+    let editor;
+
+require.config({ paths: { 'vs': 'https://unpkg.com/monaco-editor@latest/min/vs' }});
+require(['vs/editor/editor.main'], function () {
+  editor = monaco.editor.create(document.getElementById('editor'), {
+    value: "# Write your Python code here\nprint('Hello from NovaOS!')",
+    language: 'python',
+    theme: 'vs-dark',
+    fontSize: 14,
+    minimap: { enabled: false },
+    lineNumbers: "on"
+  });
+});
+
+async function runEditorCode() {
+  const code = editor.getValue();
+  terminal.innerText += ">>> Running editor code:\n" + code + "\n";
+  try {
+    const result = await pyodide.runPythonAsync(code);
+    terminal.innerText += result + "\n";
+  } catch (err) {
+    terminal.innerText += "[Error] " + err + "\n";
+  }
+  terminal.scrollTop = terminal.scrollHeight;
+}
+  </script>
+</body>
+</html>
