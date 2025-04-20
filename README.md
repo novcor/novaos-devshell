@@ -20,4 +20,4 @@
 
 ---
 
-Crafted with love by [Corey & Nova](https://github.com/yourusername)
+
